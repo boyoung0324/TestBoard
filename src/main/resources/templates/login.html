@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>JumMeChu</title>
+    <link rel="stylesheet" href="/css/menu.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css"/>
+    <style>
+        * { box-sizing:border-box; }
+        a { text-decoration: none; }
+        form {
+            width:400px;
+            height:500px;
+            display : flex;
+            flex-direction: column;
+            align-items:center;
+            position : absolute;
+            top:50%;
+            left:50%;
+            transform: translate(-50%, -50%) ;
+            border: 1px solid rgb(89,117,196);
+            border-radius: 10px;
+        }
+        input[type='text'], input[type='password'] {
+            width: 300px;
+            height: 40px;
+            border : 1px solid rgb(89,117,196);
+            border-radius:5px;
+            padding: 0 10px;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: rgb(89,117,196);
+            color : white;
+            width:300px;
+            height:50px;
+            font-size: 17px;
+            border : none;
+            border-radius: 5px;
+            margin : 20px 0 30px 0;
+        }
+        #title {
+            font-size : 50px;
+            margin: 40px 0 30px 0;
+        }
+        #msg {
+            height: 30px;
+            text-align:center;
+            font-size:16px;
+            color:red;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<div id="menu">
+    <ul>
+        <li><a href='/'>Home</a></li>
+        <li><a href='/api/post'/>Board</a></li>
+        <li><a href='/api/user/loginform'/>Login</a></li>
+        <li><a href='/api/user/signupform'/>Sign in</a></li>
+    </ul>
+</div>
+<form action="/api/user/login" method="post">
+<h3 id="title">Login</h3>
+<input type="text" name="user_id" placeholder="아이디 입력" autofocus>
+<input type="password" name="password" placeholder="비밀번호">
+    <button>로그인</button>
+<div>
+    <a href='/api/user/signupform'/>회원가입</a>
+</div>
+</form>
+</body>
+</html>

@@ -6,17 +6,20 @@ import com.sparta.jummechu.dto.PostRequestDto;
 import com.sparta.jummechu.dto.PostResponseDto;
 import com.sparta.jummechu.security.UserDetailsImpl;
 import com.sparta.jummechu.service.PostService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 
-@RestController
+@Controller
 @Slf4j
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -24,25 +27,57 @@ public class PostController {
 
     private final PostService postService;
 
-    //전체 조회
-    @GetMapping("/post")
-    public List<PostListResponseDto> getPost() {
-        return postService.getPost();
+
+    //    ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+    @GetMapping("/post") //board의 첫 화면 게시물 목록 --> getPage
+    public String list(Model m) {
+
+        try {
+
+            List<PostListResponseDto> postList = postService.getPost();
+            m.addAttribute("postList", postList);
+            return "boardList"; // 로그인을 한 상태이면, 게시판 화면으로 이동
+
+        } catch (Exception e) {
+            return "redirect:/";
+        }
+
+
     }
+
+//    ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    //전체 조회
+//    @GetMapping("/post")
+//    public List<PostListResponseDto> getPost() {
+//        return postService.getPost();
+//    }
 
 
     //선택 조회
     @GetMapping("/post/{id}")
-    public PostListResponseDto getPostById(@PathVariable Long id) {
-        return postService.getPostById(id);
+    public String getPostById(@PathVariable Long id,Model model) {
+        PostListResponseDto postList =  postService.getPostById(id);
+        model.addAttribute("postList",postList);
+        return "board";
 
+    }
+
+
+    @GetMapping("/post/write")
+    public String write(Model model) { //작성할 때 user값이 안 들어옴
+
+        return "writePost";
     }
 
 
     //작성
     @PostMapping("/post")
-    public PostResponseDto writePost(@RequestBody PostRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return postService.writePost(requestDto, userDetails.getUser());
+    public String writePost(PostRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails,Model model) {
+        PostResponseDto responseDto = postService.writePost(requestDto, userDetails.getUser());
+        model.addAttribute("post",responseDto);
+
+        return "writePost";
     }
 
     //삭제

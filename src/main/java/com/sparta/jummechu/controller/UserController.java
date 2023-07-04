@@ -10,11 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {
@@ -24,32 +25,43 @@ public class UserController {
     private final JwtUtil jwtUtil;
 
 
+    @GetMapping("/loginform")
+    public String loginForm() {
+        return "login";
+    }
+
+    @GetMapping("/signupform")
+    public String signForm() {
+        return "signup";
+    }
+
+
     //회원가입
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponseDto> signup(@RequestBody @Valid SignupRequestDto requestDto) {
+    public String signup(@Valid SignupRequestDto requestDto) {
 
         try{
             userService.signup(requestDto);
         }catch (IllegalArgumentException e){
-            return ResponseEntity.badRequest().body(new ApiResponseDto("중복된 id 입니다.", HttpStatus.BAD_REQUEST.value()));
+            return "redirect:/api/user/signupform";
         }
 
-        return ResponseEntity.ok().body(new ApiResponseDto("회원가입 성공", HttpStatus.CREATED.value()));
+        return "redirect:/";
 
     }
 
     //로그인
     @PostMapping("/login")
-    public ResponseEntity<ApiResponseDto> login(@RequestBody @Valid LoginRequestDto requestDto,HttpServletResponse response) {
+    public String login(@Valid LoginRequestDto requestDto,HttpServletResponse response) {
         try {
             userService.login(requestDto);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(new ApiResponseDto("회원을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST.value()));
+        } catch (Exception e) {
+            return "redirect:/api/user/loginform";
         }
         //login()에서 에러가 없으면 실행
 
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(requestDto.getUser_id(),userService.findUser(requestDto.getUser_id()).getRole()));
-        return ResponseEntity.ok().body(new ApiResponseDto("로그인 성공", HttpStatus.CREATED.value()));
+            return "redirect:/";
     }
 
     //프로필 보기
@@ -61,7 +73,7 @@ public class UserController {
 
     //프로필 수정
     @PutMapping("/profile")
-    public ResponseEntity<ApiResponseDto> updateProfile(@RequestBody @Valid ProfileRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public ResponseEntity<ApiResponseDto> updateProfile(@Valid ProfileRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
         try{
             userService.updateProfile(requestDto,userDetails.getUser());
             return ResponseEntity.ok().body(new ApiResponseDto("수정 완료", HttpStatus.OK.value()));
@@ -73,7 +85,7 @@ public class UserController {
 
     //비밀번호 수정
     @PutMapping("/password")
-    public ResponseEntity<ApiResponseDto> updatePassword(@RequestBody @Valid PasswordRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public ResponseEntity<ApiResponseDto> updatePassword(@Valid PasswordRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
         try{
             userService.updatePassword(requestDto,userDetails.getUser());
             return ResponseEntity.ok().body(new ApiResponseDto("수정 완료", HttpStatus.OK.value()));
