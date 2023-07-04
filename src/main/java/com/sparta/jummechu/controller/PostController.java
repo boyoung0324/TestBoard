@@ -28,7 +28,6 @@ public class PostController {
     private final PostService postService;
 
 
-    //    ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
     @GetMapping("/post") //board의 첫 화면 게시물 목록 --> getPage
     public String list(Model m) {
 
@@ -45,14 +44,6 @@ public class PostController {
 
     }
 
-//    ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
-    //전체 조회
-//    @GetMapping("/post")
-//    public List<PostListResponseDto> getPost() {
-//        return postService.getPost();
-//    }
-
 
     //선택 조회
     @GetMapping("/post/{id}")
@@ -64,14 +55,15 @@ public class PostController {
     }
 
 
+    //글 쓰기 화면
     @GetMapping("/post/write")
-    public String write(Model model) { //작성할 때 user값이 안 들어옴
+    public String write(Model model) {
 
         return "writePost";
     }
 
 
-    //작성
+    //작성, user값이 안 들어옴
     @PostMapping("/post")
     public String writePost(PostRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails,Model model) {
         PostResponseDto responseDto = postService.writePost(requestDto, userDetails.getUser());
@@ -95,7 +87,7 @@ public class PostController {
 
     //    수정
     @PutMapping("/post/{id}")
-    public ResponseEntity<ApiResponseDto> updatePost(@PathVariable Long id, @RequestBody PostRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<ApiResponseDto> updatePost(@PathVariable Long id, PostRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         try {
             postService.updatePost(id, requestDto, userDetails.getUser());
             return ResponseEntity.ok().body(new ApiResponseDto("수정 완료", HttpStatus.OK.value()));
